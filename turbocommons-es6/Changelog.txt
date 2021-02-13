@@ -1,0 +1,42 @@
+turbocommons-ts DEV CHANGELOG ---------------------------------------------
+
+
+
+
+VERSION: 3.7.0 ---------------------------------------------
+
+2020-07-06: MINOR: Added forceNonEmptyArray method to ArrayUtils
+
+
+
+VERSION: 3.6.0 ---------------------------------------------
+
+2020-07-02: PATCH: fixed goToUrl method with POST data
+
+2020-06-14: MINOR: Implemented force methods on StringUtils
+
+2020-06-10: PATCH: Fixed remove words methods by length on StringUtils
+
+2020-06-06: MINOR: First alpha version of the DateTimeObject class
+
+2020-05-28: MINOR: Added pad method to StringUtils
+
+2020-05-21: NA: Minor code fixes
+
+
+
+VERSION: 3.5.0 ---------------------------------------------
+
+2020-05-13: PATCH: Fixed bug on HTTPManager and added tests
+
+
+
+VERSION: 3.4.2 ---------------------------------------------
+
+2020-05-12: MINOR: Added disable and enable back button to BrowserManager
+
+
+
+VERSION: 3.4.1 ---------------------------------------------
+
+2020-05-08: PATCH: Fixed bug on LocalizationManager when using multiple locations

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Chatbot</title>
+    <script src="turbocommons-es5/turbocommons-es5.js"></script>
+    <script type="text/javascript" src="chatbot.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+    .user {
+        background-color: rgb(0,62,56);
+        background-color: #435056;
+        color: white;
+        width:20%;
+        margin-left: auto;
+        margin-right: 0;
+        margin-top: 10px;
+		margin-bottom: auto;
+		font-size: 12px;
+		border-radius: 4px!important;
+    }
+    .bot {
+        background-color: #435056;
+        background-color: #f2f2f2;
+        color: black;
+        width: 40%;
+        margin-left: 0;        
+        margin-top: 10px;
+		margin-bottom: auto;
+		font-size: 12px;
+		border-radius: 4px!important;
+    }
+    .cont {
+        background-color: #b90000;
+        background-color: rgb(28,33,36);        
+        width: 80%;
+        margin-left: 0;
+    }
+    </style>
+</head>
+<body>
+<div>
+    <div id="main" class="container-fluid cont">
+    </div>
+    <div class="container-fluid cont">    
+        <div><input id="input" type="text" style="width:100%; margin-top: 10px;" placeholder="Scrivi qui le tue domande..."/></div>    
+    </div>
+</div>
+</body>
+</html>
