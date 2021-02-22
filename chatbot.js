@@ -1,6 +1,4 @@
 var StringUtils = org_turbocommons.StringUtils;
-var n = StringUtils.countWords("word1 word2 word3");
-console.log(n);
 const arr = [
   [["ciao", "hello", "hey", "buon giorno", "salve", "buongiorno", "buonasera", "buona sera", "buon pomeriggio", "hola", "salute"], ["Ciao", "Salve", "Salute a te", "Welcome!", "Benvenuta/o"]],
   [["aiuto", "help"], ["Ti aiuto io, puoi dirmi cosa ti serve!", "Sono qui per aiutarti, chiedi pure."]],
@@ -22,7 +20,7 @@ const imSorry = [
     "vorrei tanto che il mio programmatore avesse studiato abbastanza per poterti capire meglio.",
     "sarebbe stato fantastico se il mio programmatore non si fosse limitato a studiare per il 18.",
     "a volte vorrei che il mio programmatore si impegnasse di più a farmi sembrare intelligente.",
-    "mhh mi sa che non ho capito bene."
+    "mi sa che non ho capito bene."
 ];
 const repeat = [
     "Potresti spiegarti meglio?",
@@ -38,9 +36,34 @@ const gotcha= [
     "Va bene!",
     "Afferrato!",
     "D'accordo!",
+    "Perfetto!",
+    "No problem!"
+]
+const yes= [
+    "Ottimo!",
+    "Lieto di aiutarti!",
+    "Mi fa piacere!",
+    "Felice di aiutarti!",
+    "Fantastico!",
     "Perfetto!"
 ]
+const no= [
+    "mi dispiace, cerco di fare del mio meglio 😭",
+    "mi dispiace, puoi concedermi un altro pò di pazienza?"
+]
+const didI= [
+    "Ti sono stato d'aiuto?",
+    "Era quello che cercavi?",
+    "Sono stato utile?",
+    "Era quello che stavi cercando?",
+    "Ho chiarito i tuoi dubbi?"
+]
 
+const iWasSaying= [
+    "Prima dicevo",
+    "Stavo dicendo",
+    "Dicevo"
+]
 function addChat(input, result) {
     mainDiv = document.getElementById("main");
     if (input!=null)
@@ -86,18 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-var name;
-var userLost=0;
-var userMoreLost=false;
+
 function output(input) {
     let result=null;
     let text = input.toLowerCase().replace(/[^\w\s\d]/gi, "");
-    if (text.length===0) return;
+    if (text.length===0)
+        return;
     addChat(input,null);
     if (currentNode===null)         //first iteration
     {
         name= checkName(text);
-        result= "Bene " + name + ", di cosa hai bisogno? " + node0.getSolution();
+        result= "Bene " +"<strong>"+ name +"</strong>"+ ", di cosa hai bisogno? " + node0.getSolution();
         currentNode=node0;
     }
     else                    //every other iteration
@@ -107,12 +129,16 @@ function output(input) {
             result=searchNodes(text);           //search into node tree
         if (userMoreLost && result!=null)
             userMoreLost=false;
-        if (result===null)
-            result = name + ", " + imSorry[Math.floor(Math.random() * imSorry.length)] + " " + repeat[Math.floor(Math.random() * repeat.length)];
+        if (result===null) {
+            notFound=true;
+            result = "<strong>" + name + "</strong>" + ", " + imSorry[Math.floor(Math.random() * imSorry.length)] + " " + repeat[Math.floor(Math.random() * repeat.length)];
+        }
     }
     addChat(null, result);
-    if (result.startsWith(name))
+    if (notFound) {
         repromptUser();
+        notFound = false;
+    }
     window.scrollTo(0,document.body.scrollHeight);
 }
 function checkName(text){
@@ -125,18 +151,38 @@ function checkName(text){
 function searchEndpoints(text){
     let solution= endpoints.findByInput(text);
     if (solution!=null) {
-        currentNode= node0;
-        return solution.getSolution();
+        if (Array.isArray(solution))    //conflict of keywords. needs to specify
+        {
+            console.log(solution);
+            var result = "Intendi " + solution[0].getName();
+            for (let i=1;i<solution.length;i++) {
+                if (i === solution.length - 1)
+                    result = result.concat(" o " + solution[i].getName() + " ?");
+                else
+                    result = result.concat(", " + solution[i].getName());
+            }
+            return result;
+        }
+        else {
+            //it's going to ask if endpoint solution is the one requested
+            nodeYesNo.setSolution(didI[Math.floor(Math.random() * didI.length)]);
+            previousNode = solution;
+            currentNode = nodeYesNo;
+            addChat(null, solution.getSolution())
+            return "<strong>" + name + "</strong>" + ", " + didI[Math.floor(Math.random() * didI.length)];
+        }
     }
     return null;
 }
+
+
 
 function searchNodes(text){
     let result=null;
     let entries= [];
     for (let i=0;i<currentNode.getNodes().length;i++) {
         for (let j = 0; j < currentNode.getNodes()[i].getKeywords().length; j++) {
-            if (text.includes(currentNode.getNodes()[i].getKeywords()[j])) {
+            if (text.includes(currentNode.getNodes()[i].getKeywords()[j]) || StringUtils.compareSimilarityPercent(currentNode.getNodes()[i].getKeywords()[j],text)>=80) {
                 entries.push(currentNode.getNodes()[i]);
                 break;
             }
@@ -144,11 +190,15 @@ function searchNodes(text){
     }
     if (entries.length===1)
     {
-        result=gotcha[Math.floor(Math.random() * gotcha.length)] + " " + entries[0].getSolution();
-        currentNode = entries[0];
+        if (entries[0].getCode()==="YesNo")     // yes/no node
+            result=handleYesNo(entries[0]);
+        else {
+            result = gotcha[Math.floor(Math.random() * gotcha.length)] + " " + entries[0].getSolution();
+            currentNode = entries[0];
+        }
     }
     else if (entries.length>1) {
-        result = "Cerchi informazioni su " + entries[0].getName();
+        result = "Intendi " + entries[0].getName();
         for (let i=1;i<entries.length;i++) {
             if (i === entries.length - 1)
                 result = result.concat(" o " + entries[i].getName() + " ?");
@@ -159,22 +209,41 @@ function searchNodes(text){
     return result;
 }
 
+function handleYesNo(entry)
+{
+    if (entry===nodeYes)
+    {
+        if (previousNode.getNodes().length===0)              //is a leaf node
+            currentNode=node0;
+        else
+            currentNode=previousNode;
+        return yes[Math.floor(Math.random() * yes.length)]
+    }
+    else{
+        currentNode= index.get(previousNode.getCode().slice(0,-1));     //back to first non-endpoint node
+        while (currentNode.isEndpoint())
+            currentNode= index.get(previousNode.getCode().slice(0,-1));
+        addChat(null,"<strong>" + name + "</strong> " + no[Math.floor(Math.random() * no.length)]+ "<br>" + "Ricominciamo! " + "<br>" );
+        return currentNode.getSolution();
+    }
+}
+
 function repromptUser(){
     if (userMoreLost)
     {
         userMoreLost=false;
-        console.log("qui");
-        if (currentNode!=node0)
-            addChat(null,"Facciamo così, ricominciamo! " + currentNode.getSolution());
+        if (currentNode!=node0) {
+            currentNode=node0;
+            addChat(null, "Facciamo così, ricominciamo! " + currentNode.getSolution());
+        }
         else
             addChat(null,"Purtroppo non riesco a capirti 😭 " + currentNode.getSolution());
-        currentNode=node0;
         return;
     }
     userLost++;
     if (userLost==2)
     {
-        addChat(null,currentNode.getSolution());
+        addChat(null,iWasSaying[Math.floor(Math.random() * iWasSaying.length)] + "...<br>"+ currentNode.getSolution());
         userLost=0;
         userMoreLost=true;
     }
@@ -198,31 +267,43 @@ class Endpoints
         return results;
     }
     findByInput(text){
+        var entries= [];
         for (let i=0;i<this.endpoints.length;i++) {
             for (let j = 0; j < this.endpoints[i].getKeywords().length; j++)
-                if (text.includes(this.endpoints[i].getKeywords()[j]))
-                    return this.endpoints[i];
+                if (text.includes(this.endpoints[i].getKeywords()[j])) {
+                    entries.push(this.endpoints[i]);
+                    break;
+                }
         }
-        return null;
+        switch (entries.length){
+            case 0:
+                return null;
+                break;
+            case 1:
+                return entries[0];
+                break;
+            default:
+                return entries;
+                break;
+        }
     }
     getEndpoints(){
         return this.endpoints;
     }
 }
 
-var endpoints= new Endpoints();
-
-
 class NodeT {
-    constructor (name,code,keywords,endpoint,nodes,solution) {
+    constructor (name,code,keywords,endpoint,solution) {
         this.name = name;
-        this.code = code;
+        this.code = code.toString();
         this.keywords = keywords;
         this.endpoint = endpoint;
         if (endpoint)
             endpoints.addEndpoint(this);
-        this.nodes = nodes;
         this.solution=solution;
+        this.nodes = new Array();
+        if (this.code!=="YesNo")
+            index.set(this.code,this);
     }
     getName () {
         return this.name;
@@ -233,8 +314,8 @@ class NodeT {
     getKeywords (){
         return this.keywords;
     }
-    getEndpoint (){
-        return this.endpoint;
+    isEndpoint (){
+        return this.endpoint===true;
     }
     getNodes (){
         return this.nodes;
@@ -257,29 +338,63 @@ class NodeT {
     setNodes (nodes){
         this.nodes=nodes;
     }
+    setSolution (solution){
+        this.solution=solution;
+    }
     addChild(node){
         this.nodes.push(node);
     }
 }
 
+function createTree(){
+    node0.setNodes([node1,node2,node3,node4,node5,node6,node7,node8,node9]);
+    for (let value of index.values())
+        if (value.getCode().length>1)
+            index.get(value.getCode().slice(0,-1)).addChild(value);
+}
+
+
+var name;
+var userLost=0;
+var userMoreLost=false;
+var notFound=false;
+
+var index = new Map();          //all nodes index
+var endpoints= new Endpoints();
+
 var currentNode=null;
 
-var node0= new NodeT("nome",0,null,false,[],"Cerchi informazioni relative all'iscrizione, o sei già uno studente e cerchi informazioni relative ai corsi, laurea o tirocinio?");
-var node1= new NodeT("studiare con noi",1,["iscrivo", "iscrizione", "studiare da voi", "venire", "venire da voi","iscrivermi", "iscrivere","studiare", "orientarmi"],false,[],"Hai bisogno di informazioni sulle Lauree, sulle procedure di ammissione (per iscriverti), le iniziative di orientamento o sei interessato a trasferirti da noi da un altro ateneo o da un altro corso di laurea?");
-var node2= new NodeT("corsi",2,["corsi"],false,[],"a");
-var node3= new NodeT("orari",3,["orari"],false,[],"a");
-var node4= new NodeT("esami",4,["esami"],false,[],"a");
-var node5= new NodeT("mobilità",5,["mobilità"],false,[],"a");
-var node6= new NodeT("tutoraggio",6,["tutoraggio"],false,[],"a");
-var node7= new NodeT("tirocinio",7,["tirocinio"],false,[],"a");
-var node8= new NodeT("laurea",8,["laurea"],false,[],"a");
-var node9= new NodeT("contatti",9,["contatti"],false,[],"a");
+var nodeYes= new NodeT("si", "YesNo", ["si", "s","yes"], false,null);
+var nodeNo= new NodeT("no", "YesNo", ["no", "n", "negativo"], false, null);
+var nodeYesNo = new NodeT("si o no", "YesNo", null,false, didI[Math.floor(Math.random() * didI.length)]);
+nodeYesNo.setNodes([nodeYes,nodeNo]);
 
-node0.setNodes([node1,node2,node3,node4,node5,node6,node7,node8,node9]);
+var previousNode;
 
-var node10= new NodeT("informazioni", 10, ["informazioni", "informazioni corsi","info"], false, [], "Cerchi informazioni generali sulla Laurea Triennale o sulla Laurea Magistrale?");
-var node11= new NodeT("iscrizione", 11, ["iscrizione", "iscrivermi", "iscrivo"], false,[], "Hai bisogno di informazioni sull'iscrizione alla Laurea Triennale o alla Laurea Magistrale?");
-var node12= new NodeT("trasferimento", 12, ["trasferimento", "trasferirmi", "trasferisco", "trasferire"],true,[], "È possibile trasferirsi ai Corsi di Laurea in Informatica sia da un altro Ateneo che da un altro Corso di Laurea dell'Università della Calabria.<br>" +
+var node0= new NodeT("nome",0,null,false,"Puoi farmi qualsiasi domanda relativa al dipartimento. Cerchi ad esempio informazioni relative all'iscrizione, o sei già uno studente e cerchi informazioni relative ai corsi, laurea o tirocinio?");
+var node1= new NodeT("studiare con noi",1,["iscrivo", "iscrizione", "studiare da voi", "venire", "venire da voi","iscrivermi", "iscrivere","studiare", "orientarmi"],false,"Hai bisogno di informazioni sulle <strong>Lauree</strong>, sulle procedure di <strong>ammissione</strong> (per iscriverti), le iniziative di <strong>orientamento</strong> o sei interessato a <strong>trasferirti</strong> da noi da un altro ateneo o da un altro corso di laurea?");
+var node2= new NodeT("insegnamenti",2,["corsi","insegnamenti"],false,"Cerchi informazioni sui corsi <strong>attuali</strong> o quelli degli <strong>anni precedenti</strong>?");
+var node3= new NodeT("orari",3,["orari"],false,"Cerchi informazioni sugli orari attuali o degli anni precedenti?");
+var node4= new NodeT("esami",4,["esami"],false,
+    "∎ Sono disponibili di seguito i calendari degli esami A.A. 2020-2021 per le tre sessioni ordinarie:<br>" +
+    "<br>" +
+    "   ∎<strong>Sessione 1</strong> : Gennaio-Febbraio<br>" +
+    "<br>" +
+    "   ∎<strong>Sessione 2</strong> : Giugno-Luglio<br>" +
+    "<br>" +
+    "   ∎<strong>Sessione 3</strong> : Settembre<br>" +
+    "<br>" +
+    "∎ Le modalità di svolgimento degli esami (in presenza oppure on line) dipenderanno dall'andamento della pandemia e quindi dalle indicazioni governative.");
+var node5= new NodeT("mobilità",5,["mobilità"],false,"a");
+var node6= new NodeT("tutoraggio",6,["tutoraggio"],false,"a");
+var node7= new NodeT("tirocinio",7,["tirocinio"],false,"a");
+var node8= new NodeT("laurea",8,["laurea"],false,"a");
+var node9= new NodeT("contatti",9,["contatti"],false,"a");
+
+
+var node10= new NodeT("informazioni", 10, ["informazioni", "informazioni corsi","info"], false,  "Cerchi informazioni generali sulla Laurea Triennale o sulla Laurea Magistrale?");
+var node11= new NodeT("iscrizione", 11, ["iscrizione", "iscrivermi", "iscrivo"], false, "Hai bisogno di informazioni sull'iscrizione alla Laurea Triennale o alla Laurea Magistrale?");
+var node12= new NodeT("trasferimento", 12, ["trasferimento", "trasferirmi", "trasferisco", "trasferire"],true, "È possibile trasferirsi ai Corsi di Laurea in Informatica sia da un altro Ateneo che da un altro Corso di Laurea dell'Università della Calabria.<br>" +
     "In entrambi i casi è necessario avere sostenuto esami per almeno 25 CFU e che sia possibile convalidare almeno altrettanti CFU nella nuova carriera " +
     "in base al corrente <a href=\"https://www.informatica.unical.it/regolamenti\">Manifesto degli studi</a>. Il periodo per presentare domanda formale di passaggio / trasferimento è<br>" +
     "   ∎ 1 agosto - 10 settembre<br>" +
@@ -288,15 +403,50 @@ var node12= new NodeT("trasferimento", 12, ["trasferimento", "trasferirmi", "tra
     "   ∎ 10 gennaio<br>" +
     "   ∎ 10 giugno<br> <br>" +
     "Ogni richiesta di parere deve essere inviata per email seguendo le istruzioni riportate in <a href=\"https://informatica.unical.it/iscrizione/convalidaesami\">questa pagina</a>. Non è possibile integrare richieste già inviate, ma è possibile inviare una nuova richiesta che sostituisce la precedente. I richiedenti potrebbero essere convocati presso gli uffici del Dipartimento per fornire chiarimenti sulla propria richiesta.");
-var node13= new NodeT("orientamento", 13, ["orientamento"], true, [], "Le nostre iniziative di orientamento consistono in : <br>" +
+var node13= new NodeT("orientamento", 13, ["orientamento"], true,  "Le nostre iniziative di orientamento consistono in : <br>" +
     "   ∎ Corso di Approfondimento in Matematica e Informatica e Corso di Preparazione al TOLC-I <br>" +
     "   ∎ Corsi di Preparazione alle Olimpiadi<br>" +
     "Per saperne di più vai alla <a href=\"https://informatica.unical.it/orientamentoiningresso\">pagina dedicata</a>");
+var node100= new NodeT("informazioni triennale",100,["informazioni triennale","informazioni della triennale", "informazioni sulla triennale", "info triennale"],true,
+    "Il corso di studio in Informatica ha l'obiettivo generale di formare una figura professionale orientata al problem-solving, con buone conoscenze nel campo delle scienze computazionali e dei sistemi informatici, capace di comprendere ed utilizzare modelli matematici di interesse scientifico, tecnologico ed economico, e qualificata a svolgere, in ambito aziendale, attività di realizzazione e gestione di sistemi software avanzati e reti di computer. Ai fini indicati, entrambi i curricula del corso di studio in Informatica comprendono attività finalizzate ad acquisire conoscenza dei principi, della struttura e dell'utilizzo dei sistemi di elaborazione; nonché tecniche e metodi di progettazione e realizzazione di sistemi informatici. Particolare attenzione viene prestata alle tecnologie innovative quali quelle legate all'intelligenza artificiale, e allo sviluppo di applicazioni avanzate in contesto industriale.<br>" +
+    "<br>" +
+    "Il corso di studio in Informatica prevede, infatti, due curricula : <strong>Artificial Intelligence </strong> e <strong> Enterprise Applications. </strong>" +
+    "<br><br><br>Per una panoramica completa, consulta la <a href=\"https://www.universitaly.it/index.php/public/schedaCorso/anno/2020/corso/1563079\">scheda dettagliata</a> sul portale ufficiale Universitaly."+
+    "<br><br>Per consultare i piani di studio con l'elenco di tutti gli insegnamenti vai alla <a href=\"https://informatica.unical.it/insegnamenti\">pagina dedicata</a> .");
+var node1000= new NodeT("Artificial Intelligence", 1000,  ["artificial intelligence","artificial triennale","intelligence triennale"],true,
+    "Progettato per fornire al laureato le competenze necessarie all'applicazione delle tecniche di base dell'intelligenza artificiale e della modellazione basata sui dati necessarie per la progettazione di sistemi software capaci di fornire all'elaboratore elettronico prestazioni che, a un osservatore comune, sembrerebbero essere di pertinenza esclusiva dell'intelligenza umana.");
+var node1001= new NodeT("Enterprise Applications", "1001", ["enterprise applications","enterprise triennale", "applications triennale"],true,
+    "Progettato per fornire al laureato le competenze necessarie per modellare applicazioni industriali capaci di supportare interi processi aziendali al fine di migliorarne la produttività e l'efficienza.");
+var node101= new NodeT("Informazioni magistrale",101,["informazioni magistrale", "info magistrale", "info laurea magistrale"],true,
+    "Il Corso di Studio Magistrale in Informatica estende la formazione della laurea triennale in Informatica, al fine di formare figure professionali di livello più elevato, capaci di occupare ruoli di alto grado nelle realtà aziendali legate alle nuove tecnologie e negli enti pubblici, o di proseguire il percorso formativo accedendo a dottorati di ricerca o scuole di specializzazione." +
+    "Nel panorama nazionale, il Corso di Studio Magistrale in Informatica dell'Università della Calabria si caratterizza per una solida cultura di base che, nel campo scientifico, è legata all'Intelligenza Artificiale (settore di eccellenza internazionale per l'Università della Calabria) e pone particolare attenzione verso le tecnologie innovative per l'analisi dei dati (Data Science), e quelle legate alla sicurezza dei sistemi informatici (Security). Prevede approfondimenti sugli aspetti metodologici per la gestione agile dei progetti e la simulazione manageriale, oltre ad attività esterne, come tirocini formativi presso aziende, strutture della pubblica amministrazione e laboratori. Nello specifico, il Corso di Studio Magistrale in Informatica prevede due curricula: <bold>Artificial Intelligence and Data Science</bold> e <bold>Artificial Intelligence and Security</bold>. Per maggiori informazioni visita il <a href=\"https://informatica.unical.it/iscrizione/iscrizionemagistrale\">sito</a> ");
+var node1010= new NodeT("corso Artificial Intelligence and Data Science", 1010, ["Artificial Intelligence and Data Science"], true,
+    "Progettato per formare esperti nelle tecniche informatiche di intelligenza artificiale e dell'analisi dei dati. Oltre ad acquisire le tecniche più avanzate dell'intelligenza artificiale, lo studente acquisirà tramite questo curriculum conoscenza avanzata delle tecniche e degli strumenti per lanalisi dei dati (Data Analytics); in particolare, il curriculum risponde alla crescente domanda di esperti nel settore dovute alla diffusione di sistemi software intelligenti che gestiscono grandi quantità di dati (Big Data) per sostenere processi di supporto alle decisioni.");
+var node1011= new NodeT("corso Artificial Intelligence and Security", 1011, ["Artificial Intelligence and Security"],true,
+    "Progettato per formare esperti nelle tecniche informatiche di intelligenza artificiale e della sicurezza dei sistemi informatici. Il curriculum risponde alla crescente domanda di una figura professionale capace di padroneggiare tanto le tecnologie per lanalisi dei dati (Data Analytics) e dei processi quanto di progettare e gestire anche tutti gli aspetti legati alla sicurezza delle infrastrutture e del software.");
 
-node1.setNodes([node10,node11,node12,node13]);
+
+
+var node20= new NodeT("insegnamenti attuali", 20, ["attuali"],true,"Gli attuali corsi della triennale sono disponibili a <a href=\"https://informatica.unical.it/insegnamenti/triennale2020-2021\">questa</a> pagina. <br> <br> <a href=\"https://informatica.unical.it/insegnamenti/magistrale2020-2021\">qui</a> ci sono invece i corsi della magistrale.");
+var node21= new NodeT("anni precedenti",21,["precedenti","passati","scorsi"],false,"Hai bisogno dei corsi di quali anni? <strong>2019-2020</strong>, <strong>2016-2019</strong> o <strong>2009-2016</strong>");
+var node210= new NodeT("corsi 2019-2020", 210, ["2019-2020","2020","2019"],true,
+    "I corsi della triennale del 2019-2020 sono disponibili a <a href=\"https://informatica.unical.it/insegnamenti/triennale2019-2020\">questo</a> indirizzo. <a href=\"https://informatica.unical.it/insegnamenti/magistrale2019-2020\">Qui</a> per la magistrale.");
+var node211= new NodeT("corsi 2016-2019",211,["2016-2019","2016","2017","2018","2019"],true, "I corsi della triennale degli anni 2016-2019 sono disponibili a <a href=\"https://informatica.unical.it/insegnamenti/triennale2016-2019\">questo</a> indirizzo. <a href=\"https://informatica.unical.it/insegnamenti/magistrale2016-2019\">Qui</a> per la magistrale");
+var node212= new NodeT("corsi 2009-2016", 212, ["2009-2016","2009","2010","2011","2012","2013","2014","2015","2016"],true,"I corsi della triennale degli anni 2009-2016 sono disponibili a <a href=\"https://www.mat.unical.it/informatica/VecchieInformazioniCorsi\">questo</a> indirizzo. <a href=\"https://www.mat.unical.it/informatica/ProgrammiCorsiEstinti%28VecchioOrdinamento%29\">Qui</a> per la magistrale" );
+
+var node30= new NodeT("orari attuali", 30, ["attuali"],false,"Cerchi informazioni sugli <strong>orari</strong> della <strong>triennale</strong> o <strong>magistrale</strong>? Sei invece in cerca degli orari degli <strong>anni precedenti</strong>?")
+var node300= new NodeT("orari triennale", 300, ["orari triennale", "orari della triennale"], true,"<a href=\"https://drive.google.com/drive/folders/1c5_Amu_8mWOEa3JBrwdc4TLXPZsol5zi\">Ecco</a> gli orari della triennale.");
+var node301= new NodeT("orari magistrale", 301, ["orari magistrale", "orari della magistrale"], true, "<a href=\"https://drive.google.com/drive/folders/1c76HKOGqhruTmtLHOUfWtI7UckVzyi95\">Ecco</a> gli orari della magistrale.");
+var node31= new NodeT("orari anni precedenti", 31, ["orari anni precedenti","anni precedenti"],true,
+    "<a href=\"https://drive.google.com/drive/folders/1ifJ_cW2kY-cNDdierxaVFGqBdGBofgcN\">Ecco</a> gli orari degli anni 2019-2020. <a href=\"https://drive.google.com/drive/folders/1VHxfSOB6ef8aURVQz1xqWz54H2xV9nvd\">Qui</a> invece quelli dell'anno 2020-2021.");
+
+
+var node40= new NodeT("esami Sessione 1",40, ["sessione 1", "esami sessione 1"],false,"La <strong>sessione 1</strong> comprende i mesi di Gennaio e Febbraio. Hai bisogno degli orari della triennale o della magistrale?");
 
 
 
+createTree();
+console.log(index.values());
 
 
 
