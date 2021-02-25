@@ -139,7 +139,7 @@ function output(input) {
     {
         if (text==="aiuto")                 //help
             result=currentNode.getSolution();
-        if (text.includes("grazie") || text.contains("ringrazio"))      //thanking
+        if (text.includes("grazie") || text.includes("ringrazio"))      //thanking
             result= "Prego, se hai altre domande puoi continuare a scrivere.\", \"Al tuo servizio! 😊";
         if (result===null)
             result=searchNodes(text);           //search into current node children
@@ -421,7 +421,7 @@ var node7= new NodeT("tirocinio",7,["tirocinio"],false,
     "La manager didattica referente per i tirocini è la <a href=\"https://sites.google.com/unical.it/informatica/contattaci#h.n0eawrt7yqsk\">dott.ssa Oliva</a>." +
     "<br><br>" +
     "Il tirocinio può essere svolto <strong>in azienda</strong> o <strong>in dipartimento</strong>");
-var node8= new NodeT("laurea",8,["laurea","tesi"],true,
+var node8= new NodeT("laurea",8,["laurea","tesi","laurearmi"],true,
     "<strong>1. Richiedere</strong> e <strong>redigere</strong> la <strong>tesi</strong> di laurea.<br>" +
     "<br>" +
     "2. Aver svolto e registrato il <strong>tirocinio</strong>.<br>" +
