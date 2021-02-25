@@ -186,7 +186,7 @@ function searchEndpoints(text){
             nodeYesNo.setSolution(didI[Math.floor(Math.random() * didI.length)]);
             previousNode = solution;
             currentNode = nodeYesNo;
-            addChat(null, gotcha[Math.floor(Math.random() * gotcha.length)] + " " + solution.getSolution())
+            addChat(null, gotcha[Math.floor(Math.random() * gotcha.length)] + "<br>" + solution.getSolution())
             return "<strong>" + name + "</strong>" + ", " + didI[Math.floor(Math.random() * didI.length)];
         }
     }
@@ -211,7 +211,7 @@ function searchNodes(text){
         if (entries[0].getCode()==="YesNo")     // yes/no node
             result=handleYesNo(entries[0]);
         else {
-            result = gotcha[Math.floor(Math.random() * gotcha.length)] + " " + entries[0].getSolution();
+            result = gotcha[Math.floor(Math.random() * gotcha.length)] + "<br>" + entries[0].getSolution();
             if (entries[0].getNodes()=== null)          //is leaf node
                 currentNode= node0;
             else
@@ -283,11 +283,13 @@ class Endpoints
     findByInput(text){
         var entries= [];
         for (let i=0;i<this.endpoints.length;i++) {
-            for (let j = 0; j < this.endpoints[i].getKeywords().length; j++)
-                if (text.includes(this.endpoints[i].getKeywords()[j])) {
+            for (let j = 0; j < this.endpoints[i].getKeywords().length; j++) {
+                console.log(this.endpoints[i].getKeywords() + "   " + text);
+                if (this.endpoints[i].getKeywords()[j].includes(text)){
                     entries.push(this.endpoints[i]);
                     break;
                 }
+            }
         }
         switch (entries.length){
             case 0:
