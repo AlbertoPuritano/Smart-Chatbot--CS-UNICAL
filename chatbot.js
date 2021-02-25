@@ -199,7 +199,7 @@ function searchNodes(text){
     let entries= [];
     for (let i=0;i<currentNode.getNodes().length;i++) {
         for (let j = 0; j < currentNode.getNodes()[i].getKeywords().length; j++) {
-            if (text.includes(currentNode.getNodes()[i].getKeywords()[j]) || StringUtils.compareSimilarityPercent(currentNode.getNodes()[i].getKeywords()[j],text)>=80) {
+            if (currentNode.getNodes()[i].getKeywords()[j].includes(text) || StringUtils.compareSimilarityPercent(currentNode.getNodes()[i].getKeywords()[j],text)>=80) {
                 entries.push(currentNode.getNodes()[i]);
                 break;
             }
