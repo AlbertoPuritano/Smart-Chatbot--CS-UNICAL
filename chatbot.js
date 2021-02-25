@@ -171,7 +171,6 @@ function searchEndpoints(text){
     if (solution!=null) {
         if (Array.isArray(solution))    //conflict of keywords. needs to specify
         {
-            console.log(solution);
             var result = "Intendi " + solution[0].getName();
             for (let i=1;i<solution.length;i++) {
                 if (i === solution.length - 1)
@@ -284,7 +283,6 @@ class Endpoints
         var entries= [];
         for (let i=0;i<this.endpoints.length;i++) {
             for (let j = 0; j < this.endpoints[i].getKeywords().length; j++) {
-                console.log(this.endpoints[i].getKeywords() + "   " + text);
                 if (this.endpoints[i].getKeywords()[j].includes(text)){
                     entries.push(this.endpoints[i]);
                     break;
