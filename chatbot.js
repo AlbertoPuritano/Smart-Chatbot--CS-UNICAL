@@ -139,7 +139,7 @@ function output(input) {
     {
         if (text==="aiuto")                 //help
             result=currentNode.getSolution();
-        if (text.contains("grazie") || text.contains("ringrazio"))      //thanking
+        if (text.includes("grazie") || text.contains("ringrazio"))      //thanking
             result= "Prego, se hai altre domande puoi continuare a scrivere.\", \"Al tuo servizio! 😊";
         if (result===null)
             result=searchNodes(text);           //search into current node children
