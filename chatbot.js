@@ -198,13 +198,16 @@ function searchNodes(text){
     let result=null;
     let entries= [];
     for (let i=0;i<currentNode.getNodes().length;i++) {
+        console.log(currentNode.getNodes()[i].getKeywords());
         for (let j = 0; j < currentNode.getNodes()[i].getKeywords().length; j++) {
-            if (currentNode.getNodes()[i].getKeywords()[j].includes(text) || StringUtils.compareSimilarityPercent(currentNode.getNodes()[i].getKeywords()[j],text)>=80) {
+            console.log(text+ "    " + currentNode.getNodes()[i].getKeywords()[j]);
+            if (text.includes(currentNode.getNodes()[i].getKeywords()[j]) || StringUtils.compareSimilarityPercent(currentNode.getNodes()[i].getKeywords()[j],text)>=80) {
                 entries.push(currentNode.getNodes()[i]);
                 break;
             }
         }
     }
+    console.log(entries);
     if (entries.length===1)
     {
         if (entries[0].getCode()==="YesNo")     // yes/no node
@@ -283,7 +286,7 @@ class Endpoints
         var entries= [];
         for (let i=0;i<this.endpoints.length;i++) {
             for (let j = 0; j < this.endpoints[i].getKeywords().length; j++) {
-                if (this.endpoints[i].getKeywords()[j].includes(text)){
+                if (text.includes(this.endpoints[i].getKeywords()[j])){
                     entries.push(this.endpoints[i]);
                     break;
                 }
@@ -996,7 +999,7 @@ var node84= new NodeT("Assegnazione voto finale", 84, ["voto finale","voto laure
     "   2. il voto assegnato alla tesi dalla commissione di Laurea, anche sulla base dell'esposizione e della discussione da parte del candidato, fino a un massimo di 8 punti,<br>" +
     "<br>" +
     "   3. un bonus assegnato alle candidate e ai candidati più meritevoli sulla base della carriera e delle esperienze all'estero.")
-var node85= new NodeT("FAQ", 85, ["domande", "frequenti", "FAQ"], false,
+var node85= new NodeT("FAQ", 85, ["domande frequenti", "faq"], false,
     "∎ È possibile presentare in Inglese? Si, è possibile presentare sia in italiano che in inglese.<br>" +
     "<br>" +
     "∎ La proclamazione della Triennale e della Magistrale avvengono nello stesso momento? Tipicamente avvengono in momenti differenti secondo il calendario della seduta.<br>" +
