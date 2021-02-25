@@ -10,7 +10,6 @@ const arr = [
   [["temi di tesi", "temi tesi"], ["Per i temi di tesi contatta le professoresse/i professori con cui intendi realizzare la tesi."]],
   [["laurearmi", "laurearsi", "sulla laurea", "informazioni laurea", "info laurea", "tesi", "consegna tesi"], ["In questa pagina <a href=\"www.google.it\">link</a> trovi il vademecum sulla realizzazione/consegna della tesi e sui passi da seguire per la laurea."]],
 ];
-
 const imSorry = [
     "credo di non aver capito.",
     "mi dispiace, credo di non aver afferrato il concetto.",
@@ -64,6 +63,20 @@ const iWasSaying= [
     "Stavo dicendo",
     "Dicevo"
 ]
+
+const howAreYou=[
+    "Ho qualche bit fuori posto! 😙 ",
+    "Sto bene, ho solo qualche bit fuori posto... 😅 ",
+    "Ho la temperatura della CPU alta 😓 "
+]
+
+const hi= [
+    "Ciao",
+    "Salve",
+    "Salute a te",
+    "Welcome!",
+    "Benvenuta/o"
+]
 function addChat(input, result) {
     mainDiv = document.getElementById("main");
     if (input!=null)
@@ -92,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
             inputField.value = "";
             output(input);
         }
-    }); 
+    });
     mainDiv = document.getElementById("main");
     mainDiv.innerHTML += `<div class="card bot h-100">
     <div class="row no-gutters">
@@ -126,10 +139,12 @@ function output(input) {
     {
         if (text==="aiuto")                 //help
             result=currentNode.getSolution();
+        if (text.contains("grazie") || text.contains("ringrazio"))      //thanking
+            result= "Prego, se hai altre domande puoi continuare a scrivere.\", \"Al tuo servizio! 😊";
+        if (result===null)
+            result=searchNodes(text);           //search into current node children
         if (result===null)
             result= searchEndpoints(text);          //search endpoints (direct answers)
-        if (result===null)
-            result=searchNodes(text);           //search into node tree
         if (userMoreLost && result!=null)
             userMoreLost=false;
         if (result===null) {
@@ -343,7 +358,7 @@ class NodeT {
 }
 
 function createTree(){
-    node0.setNodes([node1,node2,node3,node4,node5,node6,node7,node8,node9]);
+    node0.setNodes([node1,node2,node3,node4,node5,node6,node7,node8,node9,nodeA]);
     for (let value of index.values())
         if (value.getCode().length>1)
             index.get(value.getCode().slice(0,-1)).addChild(value);
@@ -367,7 +382,7 @@ nodeYesNo.setNodes([nodeYes,nodeNo]);
 
 var previousNode;
 
-var node0= new NodeT("nome",0,null,false,"Puoi farmi qualsiasi domanda relativa al dipartimento. Cerchi ad esempio informazioni relative all'iscrizione, o sei già uno studente e cerchi informazioni relative ai corsi, laurea o tirocinio?");
+var node0= new NodeT("nome",0,null,false,"Puoi farmi qualsiasi domanda relativa al dipartimento. Cerchi ad esempio informazioni relative all'iscrizione, o sei già uno studente e cerchi informazioni relative ai <strong>corsi</strong>, <strong>laurea</strong> o <strong>tirocinio</strong>? O vuoi sapere qualcosa su di <strong>me</strong>?");
 var node1= new NodeT("studiare con noi",1,["iscrivo", "iscrizione", "studiare da voi", "venire", "venire da voi","iscrivermi", "iscrivere","studiare", "orientarmi"],false,"Hai bisogno di informazioni sulle <strong>Lauree</strong>, sulle procedure di <strong>ammissione</strong> (per iscriverti), le iniziative di <strong>orientamento</strong> o sei interessato a <strong>trasferirti</strong> da noi da un altro ateneo o da un altro corso di laurea?");
 var node2= new NodeT("insegnamenti",2,["corsi","insegnamenti"],true,"Cerchi informazioni sui corsi <strong>attuali</strong> o quelli degli <strong>anni precedenti</strong>?");
 var node3= new NodeT("orari",3,["orari"],true,"Cerchi informazioni sugli orari <strong>attuali</strong> o degli <strong>anni precedenti</strong>?");
@@ -441,6 +456,8 @@ var node9= new NodeT("contatti",9,["contatti"],false,
     "Vuoi sapere il nostro<strong>indirizzo</strong>? Vuoi accedere al MS <strong>team</strong> di tutti gli studenti?" +
     "<br> Vuoi contattare il <strong>coordinatore</strong>, il <strong>manager didattico</strong> o la <strong>segreteria studenti</strong>?" +
     "<br> Oppure vuoi dare un'occhiata ai nostri <strong>social</strong> o darci dei <strong>suggerimenti</strong>?");
+var nodeA= new NodeT("parlami di te", "A", [" te ", "parlami"], false,
+    "Vuoi sapere qualcosa su di me? Ti accontenterò, ma sappi che non ho molte cose da dire, sono un solo semplice robot 😅");
 
 
 var node10= new NodeT("informazioni", 10, ["informazioni", "informazioni corsi","info"], false,  "Cerchi informazioni generali sulla Laurea Triennale o sulla Laurea Magistrale?");
@@ -1074,6 +1091,19 @@ var node95= new NodeT("social", 95, ["social", "social network"], true,
     "∎ <a href=\"https://www.facebook.com/offertelavoroeannuncicdsinformaticaunical\">Offerte di lavoro e annunci suggeriti dal corso di laurea</a>")
 var node96= new NodeT("suggerimenti", 96, ["suggerimenti", "suggerirti"], true,
     "Se hai suggerimenti o vuoi segnalare un malfunzionamento del nostro sito, <a href=\"https://informatica.unical.it/segnala\">clicca qui</a>. La tua opinione è importante per noi!")
+
+
+var nodeA0= new NodeT("nome", "A0", ["chiami", "come ti"], true,
+    "Mi chiamo DOM, è un piacere aiutare chi ne ha bisogno 😊 ");
+var nodeA1= new NodeT("come sto", "A1", ["come stai","come va"], howAreYou[Math.floor(Math.random() * howAreYou.length)]);
+var nodeA2= new NodeT("chi sono", "A2", ["chi sei"], true,
+    "Sono DOM, l'assistente del corso di Laurea in Informatica, lieto di aiutarti  😙 ");
+var nodeA3= new NodeT("cosa fai", "A3", ["che fai", "cosa fai"], true,
+    "Sono un robot programmato per assistere chiunque abbia domande sul nostro corso di Laurea. Sono ancora un pò tonto, però faccio del mio meglio per migliorare ogni giorno ✌️ ");
+var nodeA4= new NodeT("ciao", "A4", ["ciao", "hello", "hey", "buon giorno", "salve", "buongiorno", "buonasera", "buona sera", "buon pomeriggio", "hola", "salute"],
+hi[Math.floor(Math.random() * hi.length)]);
+var nodeA5= new NodeT("l'innominabile", "A5", ["ingegneria informatica"], true, "Pessima scelta  🤢 ");
+
 
 
 
