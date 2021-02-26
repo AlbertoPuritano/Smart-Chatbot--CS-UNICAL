@@ -1,15 +1,4 @@
 var StringUtils = org_turbocommons.StringUtils;
-const arr = [
-  [["ciao", "hello", "hey", "buon giorno", "salve", "buongiorno", "buonasera", "buona sera", "buon pomeriggio", "hola", "salute"], ["Ciao", "Salve", "Salute a te", "Welcome!", "Benvenuta/o"]],
-  [["aiuto", "help"], ["Ti aiuto io, puoi dirmi cosa ti serve!", "Sono qui per aiutarti, chiedi pure."]],
-  [["grazie"], ["Prego, se hai altre domande puoi continuare a scrivere.", "Al tuo servizio! :)"]],
-  [["come stai"], ["Ho qualche bit fuori posto! :)", "Sto bene, ho solo qualche bit fuori posto...", "Ho la temperatura della CPU alta :("]],
-  [["come ti chiami", "il tuo nome", "chi sei"], ["Mi chiamo Roby, sono l'assistente del corso di studi in informatica!"]],
-  [["laurea"], ["Cerchi informazioni sulla seduta di laurea o sulla consegna della tesi di laurea?"]],
-  [["seduta di laurea", "seduta laurea", "seduta"], ["Le informazioni sulle sedute di laurea sono disponibili a questo <a href=\"www.google.it\">link</a>."]],
-  [["temi di tesi", "temi tesi"], ["Per i temi di tesi contatta le professoresse/i professori con cui intendi realizzare la tesi."]],
-  [["laurearmi", "laurearsi", "sulla laurea", "informazioni laurea", "info laurea", "tesi", "consegna tesi"], ["In questa pagina <a href=\"www.google.it\">link</a> trovi il vademecum sulla realizzazione/consegna della tesi e sui passi da seguire per la laurea."]],
-];
 const imSorry = [
     "credo di non aver capito.",
     "mi dispiace, credo di non aver afferrato il concetto.",
@@ -100,7 +89,7 @@ function addChat(input, result) {
 document.addEventListener("DOMContentLoaded", () => {
     const inputField = document.getElementById("input")
     inputField.addEventListener("keydown", function(e) {
-        if (e.code === "Enter") {
+        if (e.code === "Enter" || e.Code==='13') {
             let input = inputField.value;
             inputField.value = "";
             output(input);
@@ -311,6 +300,9 @@ class NodeT {
         this.name = name;
         this.code = code.toString();
         this.keywords = keywords;
+        if (this.keywords!=null)
+            for (let i=0 ; i<keywords.length; i++)
+                this.keywords[i].toLowerCase();
         this.endpoint = endpoint;
         if (endpoint)
             endpoints.addEndpoint(this);
