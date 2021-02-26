@@ -89,7 +89,7 @@ function addChat(input, result) {
 document.addEventListener("DOMContentLoaded", () => {
     const inputField = document.getElementById("input")
     inputField.addEventListener("keydown", function(e) {
-        if (e.code === "Enter" || e.Code==='13') {
+        if (e.code === "Enter" || e.keyCode===13) {
             let input = inputField.value;
             inputField.value = "";
             output(input);
@@ -187,16 +187,13 @@ function searchNodes(text){
     let result=null;
     let entries= [];
     for (let i=0;i<currentNode.getNodes().length;i++) {
-        console.log(currentNode.getNodes()[i].getKeywords());
         for (let j = 0; j < currentNode.getNodes()[i].getKeywords().length; j++) {
-            console.log(text+ "    " + currentNode.getNodes()[i].getKeywords()[j]);
             if (text.includes(currentNode.getNodes()[i].getKeywords()[j]) || StringUtils.compareSimilarityPercent(currentNode.getNodes()[i].getKeywords()[j],text)>=80) {
                 entries.push(currentNode.getNodes()[i]);
                 break;
             }
         }
     }
-    console.log(entries);
     if (entries.length===1)
     {
         if (entries[0].getCode()==="YesNo")     // yes/no node
@@ -232,9 +229,12 @@ function handleYesNo(entry)
         return yes[Math.floor(Math.random() * yes.length)]
     }
     else{
+        console.log("qui");
         currentNode= index.get(previousNode.getCode().slice(0,-1));     //back to first non-endpoint node
-        while (currentNode.isEndpoint())
+        console.log("qua");
+        while (currentNode.isEndpoint() && currentNode.getCode().length!=1)
             currentNode= index.get(previousNode.getCode().slice(0,-1));
+        console.log("quo");
         addChat(null,"<strong>" + name + "</strong> " + no[Math.floor(Math.random() * no.length)]+ "<br>" + "Ricominciamo! " + "<br>" );
         return currentNode.getSolution();
     }
@@ -416,7 +416,8 @@ var node7= new NodeT("tirocinio",7,["tirocinio"],false,
     "La manager didattica referente per i tirocini è la <a href=\"https://sites.google.com/unical.it/informatica/contattaci#h.n0eawrt7yqsk\">dott.ssa Oliva</a>." +
     "<br><br>" +
     "Il tirocinio può essere svolto <strong>in azienda</strong> o <strong>in dipartimento</strong>");
-var node8= new NodeT("laurea",8,["laurea","tesi","laurearmi"],true,
+var node8= new NodeT("laurea",8,["laurea","laurearmi"],true,
+    "Questi sono gli step da seguire per <strong>laurearti</strong>: <br><br>" +
     "<strong>1. Richiedere</strong> e <strong>redigere</strong> la <strong>tesi</strong> di laurea.<br>" +
     "<br>" +
     "2. Aver svolto e registrato il <strong>tirocinio</strong>.<br>" +
