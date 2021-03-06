@@ -231,12 +231,9 @@ function handleYesNo(entry)
         return yes[Math.floor(Math.random() * yes.length)]
     }
     else{
-        console.log("qui");
         currentNode= index.get(previousNode.getCode().slice(0,-1));     //back to first non-endpoint node
-        console.log("qua");
         while (currentNode.isEndpoint() && currentNode.getCode().length!=1)
             currentNode= index.get(previousNode.getCode().slice(0,-1));
-        console.log("quo");
         addChat(null,"<strong>" + name + "</strong> " + no[Math.floor(Math.random() * no.length)]+ "<br>" + "Ricominciamo! " + "<br>" );
         return currentNode.getSolution();
     }
@@ -383,7 +380,7 @@ var nodeA3= new NodeT("cosa fai", "A3", ["che fai", "cosa fai"], true,
 var nodeA4= new NodeT("ciao", "A4", ["ciao", "hello", "hey", "buon giorno", "salve", "buongiorno", "buonasera", "buona sera", "buon pomeriggio", "hola", "salute"],true,
     hi[Math.floor(Math.random() * hi.length)]);
 var nodeA5= new NodeT("l'innominabile", "A5", ["ingegneria informatica"], true, "Pessima scelta  🤢 ");
-console.log(index.values());
+//console.log(index.values());
 
 
 
