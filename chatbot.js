@@ -246,7 +246,7 @@ function repromptUser(){
     if (userMoreLost)
     {
         userMoreLost=false;
-        if (currentNode!=node0) {
+        if (currentNode!==node0) {
             currentNode=node0;
             addChat(null, "Facciamo così, ricominciamo! " + currentNode.getSolution());
         }
@@ -255,7 +255,7 @@ function repromptUser(){
         return;
     }
     userLost++;
-    if (userLost==2)
+    if (userLost===2)
     {
         addChat(null,iWasSaying[Math.floor(Math.random() * iWasSaying.length)] + "...<br>"+ currentNode.getSolution());
         userLost=0;
