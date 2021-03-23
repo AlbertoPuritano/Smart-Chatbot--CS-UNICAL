@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="col-sm-7">
             <div class="card-body">
-                Ciao, sono l'assistente del corso di studi in informatica, piacere Dom! Con chi ho il piacere di parlare?
+                Ciao, sono l'assistente del corso di studi in informatica, piacere <strong>Dom</strong>! Con chi ho il piacere di parlare?
             </div>
         </div>
     </div>
@@ -162,12 +162,12 @@ function searchEndpoints(text){
     if (solution!=null) {
         if (Array.isArray(solution))    //conflict of keywords. needs to specify
         {
-            var result = "Intendi " + solution[0].getName();
+            var result = "Intendi <strong>" + solution[0].getName() + "</strong>";
             for (let i=1;i<solution.length;i++) {
                 if (i === solution.length - 1)
-                    result = result.concat(" o " + solution[i].getName() + " ?");
+                    result = result.concat(" o <strong>" + solution[i].getName() + "</strong>?");
                 else
-                    result = result.concat(", " + solution[i].getName());
+                    result = result.concat(", <strong>" + solution[i].getName() + "</strong>");
             }
             return result;
         }
@@ -209,12 +209,12 @@ function searchNodes(text){
         }
     }
     else if (entries.length>1) {
-        result = "Intendi " + entries[0].getName();
+        result = "Intendi <strong>" + entries[0].getName() + "</strong>";
         for (let i=1;i<entries.length;i++) {
             if (i === entries.length - 1)
-                result = result.concat(" o " + entries[i].getName() + " ?");
+                result = result.concat(" o <strong>" + entries[i].getName() + "</strong>?");
             else
-                result = result.concat(", " + entries[i].getName());
+                result = result.concat(", <strong" + entries[i].getName()+ "</strong>");
         }
     }
     return result;
@@ -224,16 +224,17 @@ function handleYesNo(entry)
 {
     if (entry===nodeYes)
     {
-        if (previousNode.getNodes().length===0)              //is a leaf node
-            currentNode=node0;
+        console.log(previousNode);
+        if (previousNode.getNodes().length===0)            //is a leaf node
+            currentNode = node0;
         else
             currentNode=previousNode;
         return yes[Math.floor(Math.random() * yes.length)]
     }
     else{
         currentNode= index.get(previousNode.getCode().slice(0,-1));     //back to first non-endpoint node
-        while (currentNode.isEndpoint() && currentNode.getCode().length!=1)
-            currentNode= index.get(previousNode.getCode().slice(0,-1));
+        while (currentNode.isEndpoint() && currentNode.getCode().length!==1)
+            currentNode = index.get(currentNode.getCode().slice(0,-1));
         addChat(null,"<strong>" + name + "</strong> " + no[Math.floor(Math.random() * no.length)]+ "<br>" + "Ricominciamo! " + "<br>" );
         return currentNode.getSolution();
     }
@@ -274,7 +275,7 @@ class Endpoints
         var entries= [];
         for (let i=0;i<this.endpoints.length;i++) {
             for (let j = 0; j < this.endpoints[i].getKeywords().length; j++) {
-                if (text.includes(this.endpoints[i].getKeywords()[j])){
+                if (text.includes(this.endpoints[i].getKeywords()[j]) || StringUtils.compareSimilarityPercent(this.endpoints[i].getKeywords()[j], text) >= 70){
                     entries.push(this.endpoints[i]);
                     break;
                 }
