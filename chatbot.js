@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function output(input) {
     let result=null;
-    let text = input.toLowerCase().replace(/[^\w\s\d]/gi, "");
+    let text = input.toLowerCase().replace(/[^\s\d[A-Za-z0-9]]/gi, "");
     if (text.length===0)
         return;
     addChat(input,null);
@@ -214,7 +214,7 @@ function searchNodes(text){
             if (i === entries.length - 1)
                 result = result.concat(" o <strong>" + entries[i].getName() + "</strong>?");
             else
-                result = result.concat(", <strong" + entries[i].getName()+ "</strong>");
+                result = result.concat(", <strong>" + entries[i].getName()+ "</strong>");
         }
     }
     return result;
@@ -224,7 +224,6 @@ function handleYesNo(entry)
 {
     if (entry===nodeYes)
     {
-        console.log(previousNode);
         if (previousNode.getNodes().length===0)            //is a leaf node
             currentNode = node0;
         else
