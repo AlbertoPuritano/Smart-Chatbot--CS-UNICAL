@@ -120,6 +120,7 @@ function output(input) {
     if (text.length===0)
         return;
     addChat(input,null);
+    
     if (currentNode===null)         //first iteration
     {
         name= checkName(text);
